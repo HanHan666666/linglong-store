@@ -37,7 +37,7 @@ jobs:
             --platform ${{ matrix.docker-platform }} \
             -v $(pwd):/workspace \
             -w /workspace \
-            debian:10-slim \
+            debian:10.10-slim \
             bash -c "
               set -e
           
