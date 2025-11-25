@@ -31,6 +31,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Make build.sh executable
+        run: chmod +x build.sh
+
       - name: Build in Docker (Debian 10)
         run: |
           docker run --rm \
@@ -38,58 +41,7 @@ jobs:
             -v "$(pwd)":/workspace \
             -w /workspace \
             debian:10.10-slim \
-            bash -c "
-              set -e
-
-              echo '>>> 切换到 Debian 10 的归档源'
-              cat >/etc/apt/sources.list << 'EOF'
-              deb http://archive.debian.org/debian buster main contrib non-free
-              deb http://archive.debian.org/debian buster-updates main contrib non-free
-              deb http://archive.debian.org/debian-security buster/updates main contrib non-free
-              EOF
-
-              # 不校验过期时间（archive 里的 Release 都很久了）
-              echo 'Acquire::Check-Valid-Until \"false\";' > /etc/apt/apt.conf.d/99no-check-valid
-
-              echo '>>> apt-get update'
-              apt-get update
-
-              echo '>>> 安装系统依赖'
-              apt-get install -y \
-                curl \
-                wget \
-                git \
-                file \
-                build-essential \
-                pkg-config \
-                libgtk-3-dev \
-                libwebkit2gtk-4.0-dev \
-                libjavascriptcoregtk-4.0-dev \
-                libsoup2.4-dev \
-                libayatana-appindicator3-dev \
-                librsvg2-dev \
-                patchelf \
-                xdg-utils
-
-              echo '>>> 安装 Node 18'
-              curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-              apt-get install -y nodejs
-
-              echo '>>> 安装 Rust'
-              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-              . \$HOME/.cargo/env
-
-              echo '>>> 启用 pnpm（corepack）'
-              corepack enable
-              corepack prepare pnpm@9 --activate
-
-              echo '>>> 安装前端依赖'
-              pnpm install --frozen-lockfile
-
-              echo '>>> 生产构建'
-              pnpm build:pro
-            "
-
+            bash /workspace/build.sh
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
