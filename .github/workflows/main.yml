@@ -13,10 +13,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: ubuntu-18.04
+          - platform: ubuntu-22.04
             arch: amd64
             docker-platform: linux/amd64
-          - platform: ubuntu-18.04
+          - platform: ubuntu-22.04
             arch: arm64
             docker-platform: linux/arm64
     runs-on: ${{ matrix.platform }}
